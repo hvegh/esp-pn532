@@ -38,7 +38,7 @@ uint8_t _inListedTag;  // Tg number of inlisted tag.
 
 //IRQ Event handler
 #define ESP_INTR_FLAG_DEFAULT 0
-static xQueueHandle IRQQueue = NULL;
+static QueueHandle_t IRQQueue = NULL;
 // Uncomment these lines to enable debug output for PN532(SPI) and/or MIFARE related code
 
 //#define CONFIG_PN532DEBUG CONFIG_PN532DEBUG
@@ -194,7 +194,7 @@ bool init_PN532_I2C (uint8_t sda, uint8_t scl, uint8_t reset, uint8_t irq, i2c_p
   //Lets configure GPIO PIN for Reset
   gpio_config_t io_conf;
   //disable interrupt
-  io_conf.intr_type = GPIO_PIN_INTR_DISABLE;
+  io_conf.intr_type = GPIO_INTR_DISABLE;
   //set as output mode
   io_conf.mode = GPIO_MODE_OUTPUT;
   //bit mask of the pins that you want to set,e.g.GPIO18/19
@@ -213,7 +213,7 @@ bool init_PN532_I2C (uint8_t sda, uint8_t scl, uint8_t reset, uint8_t irq, i2c_p
 
   io_conf.intr_type = GPIO_PIN_INTR_NEGEDGE;
 #else
-	io_conf.intr_type = GPIO_PIN_INTR_DISABLE;
+	io_conf.intr_type = GPIO_INTR_DISABLE;
 #endif
 
   //set as output mode
@@ -283,7 +283,7 @@ bool readdata (uint8_t *buff, uint8_t n)
   i2c_master_read_byte (i2ccmd, &buffer[n + 2], I2C_MASTER_LAST_NACK);
   i2c_master_stop (i2ccmd);
 
-  if (i2c_master_cmd_begin (PN532_I2C_PORT, i2ccmd, I2C_READ_TIMEOUT / portTICK_RATE_MS) != ESP_OK)
+  if (i2c_master_cmd_begin (PN532_I2C_PORT, i2ccmd, I2C_READ_TIMEOUT / portTICK_PERIOD_MS) != ESP_OK)
   {
     //Reset i2c bus
     i2c_cmd_link_delete (i2ccmd);
